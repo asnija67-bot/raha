@@ -8,8 +8,8 @@ app = Flask(__name__)
 API_KEY = "AIzaSyAUpdlOcI56F-S4rqzwXxOdlYNXz-Zv1pA"
 genai.configure(api_key=API_KEY)
 
-# استخدام أحدث موديل متاح
-model = genai.GenerativeModel('gemini-1.5-flash')
+# النسخة الأكثر توافقاً حالياً
+model = genai.GenerativeModel('gemini-1.5-flash-8b')
 
 HTML = """
 <!DOCTYPE html>
@@ -58,7 +58,7 @@ HTML = """
                 const data = await res.json();
                 chat.innerHTML += `<div class="msg ai">${data.answer}</div>`;
             } catch (e) {
-                chat.innerHTML += `<div class="msg ai">حصلت مشكلة تقنية.. حاول تاني.</div>`;
+                chat.innerHTML += `<div class="msg ai">حصلت مشكلة في الربط.. حاول تاني.</div>`;
             }
             btn.disabled = false;
             chat.scrollTop = chat.scrollHeight;
@@ -77,12 +77,11 @@ def get_ai_response():
     data = request.json
     user_msg = data.get('message', '')
     try:
-        # صياغة الطلب بأبسط شكل ممكن
+        # صياغة الطلب بشكل مباشر جداً
         response = model.generate_content(f"أنت أخصائي نفسي مصري، رد بالعامية المصرية على: {user_msg}")
         return jsonify({"answer": response.text})
     except Exception as e:
-        # هنا هيرجع لنا الغلط "بالظبط" من جوجل عشان نحله
-        return jsonify({"answer": f"يا بطل، حصل خطأ من جوجل: {str(e)}"})
+        return jsonify({"answer": f"يا بطل، حصل خطأ: {str(e)[:100]}"})
 
 app = app
 if __name__ == "__main__":
