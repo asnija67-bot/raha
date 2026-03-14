@@ -4,12 +4,12 @@ import google.generativeai as genai
 
 app = Flask(__name__)
 
-# إعداد المفتاح مباشرة
+# المفتاح الخاص بك
 API_KEY = "AIzaSyAUpdlOcI56F-S4rqzwXxOdlYNXz-Zv1pA"
 genai.configure(api_key=API_KEY)
 
-# الحل النهائي: طلب الموديل من غير تحديد إصدار يدوي
-model = genai.GenerativeModel('gemini-1.5-flash-latest')
+# استخدام النسخة الأكثر استقراراً على الإطلاق
+model = genai.GenerativeModel('gemini-1.0-pro')
 
 HTML = """
 <!DOCTYPE html>
@@ -26,8 +26,8 @@ HTML = """
         .user { align-self: flex-start; background: #eaddff; color: #21005d; border-bottom-left-radius: 4px; }
         .ai { align-self: flex-end; background: #ffffff; color: #1c1b1f; border: 1px solid #cac4d0; border-bottom-right-radius: 4px; }
         .input-area { background: white; padding: 15px; display: flex; gap: 10px; border-top: 1px solid #ddd; padding-bottom: 30px; }
-        input { flex: 1; padding: 12px; border: 1px solid #79747e; border-radius: 25px; outline: none; font-size: 16px; }
-        button { background: #6750a4; color: white; border: none; padding: 10px 22px; border-radius: 25px; cursor: pointer; font-weight: bold; }
+        input { flex: 1; padding: 12px; border: 1px solid #79747e; border-radius: 25px; outline: none; }
+        button { background: #6750a4; color: white; border: none; padding: 10px 22px; border-radius: 25px; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -49,7 +49,6 @@ HTML = """
             chat.innerHTML += `<div class="msg user">${text}</div>`;
             input.value = '';
             btn.disabled = true;
-            chat.scrollTop = chat.scrollHeight;
             try {
                 const res = await fetch('/get_ai_response', {
                     method: 'POST',
@@ -59,7 +58,7 @@ HTML = """
                 const data = await res.json();
                 chat.innerHTML += `<div class="msg ai">${data.answer}</div>`;
             } catch (e) {
-                chat.innerHTML += `<div class="msg ai">يا صاحبي حصل مشكلة تقنية.. حاول تاني.</div>`;
+                chat.innerHTML += `<div class="msg ai">حصلت مشكلة صغيرة.. حاول تاني.</div>`;
             }
             btn.disabled = false;
             chat.scrollTop = chat.scrollHeight;
@@ -78,13 +77,12 @@ def get_ai_response():
     data = request.json
     user_msg = data.get('message', '')
     try:
-        # استخدام التعليمات مباشرة جوه الـ prompt لضمان الاستجابة
-        response = model.generate_content(f"أنت أخصائي نفسي مصري حكيم وحنون، اسمك 'راحة'. رد بالعامية المصرية على: {user_msg}")
+        # صياغة الطلب بشكل بسيط جداً
+        response = model.generate_content(f"أنت أخصائي نفسي مصري، رد بالعامية المصرية على: {user_msg}")
         return jsonify({"answer": response.text})
     except Exception as e:
-        return jsonify({"answer": f"حصلت مشكلة: {str(e)[:50]}"})
+        return jsonify({"answer": f"يا بطل، حصل خطأ: {str(e)[:50]}"})
 
 app = app
 if __name__ == "__main__":
     app.run()
-    
