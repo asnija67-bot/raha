@@ -27,9 +27,9 @@
     </div>
 
     <script>
-        // مفتاحك السليم والموديل الأحدث
+        // مفتاحك السليم والموديل الأحدث على النسخة الرسمية v1
         const API_KEY = "AIzaSyC-FtNsao7WdY17dJWQbKivF_J6oDGQddg";
-        const URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
+        const URL = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
 
         async function send() {
             const input = document.getElementById('user-input');
@@ -38,13 +38,11 @@
             const text = input.value.trim();
             if(!text) return;
             
-            // عرض رسالة المستخدم
             chat.innerHTML += `<div class="msg user">${text}</div>`;
             input.value = '';
             btn.disabled = true;
             chat.scrollTop = chat.scrollHeight;
             
-            // رسالة للذكاء الاصطناعي عشان يرد بالعامية
             const prompt = `أنت أخصائي نفسي مصري حكيم وحنون اسمك 'راحة'. رد بالعامية المصرية الدافئة على: ${text}`;
             
             try {
