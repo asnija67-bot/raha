@@ -19,7 +19,7 @@
 <body>
     <div class="header">منصة راحة ✨</div>
     <div class="chat-container" id="chat">
-        <div class="msg ai">أهلاً بيك يا عبد الرحمن.. أنا هنا عشان أسمعك، احكي لي.</div>
+        <div class="msg ai">أهلاً بيك يا عبد الرحمن.. أنا "راحة"، معاك وبسمعك، فضفض براحتك.</div>
     </div>
     <div class="input-area">
         <input type="text" id="user-input" placeholder="فضفض هنا..." onkeypress="if(event.key==='Enter') send()">
@@ -27,9 +27,9 @@
     </div>
 
     <script>
-        // مفتاحك السليم والموديل الأحدث على النسخة الرسمية v1
-        const API_KEY = "AIzaSyC-FtNsao7WdY17dJWQbKivF_J6oDGQddg";
-        const URL = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
+        // مفتاحك بتاع DeepSeek متسجل هنا وجاهز
+        const API_KEY = "sk-26af8b2e4ce44f7cb1cd1858eab5adaf"; 
+        const URL = "https://api.deepseek.com/chat/completions";
 
         async function send() {
             const input = document.getElementById('user-input');
@@ -43,27 +43,32 @@
             btn.disabled = true;
             chat.scrollTop = chat.scrollHeight;
             
-            const prompt = `أنت أخصائي نفسي مصري حكيم وحنون اسمك 'راحة'. رد بالعامية المصرية الدافئة على: ${text}`;
-            
             try {
                 const response = await fetch(URL, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${API_KEY}`
+                    },
                     body: JSON.stringify({
-                        contents: [{ parts: [{ text: prompt }] }]
+                        model: "deepseek-chat",
+                        messages: [
+                            { role: "system", content: "أنت أخصائي نفسي مصري حكيم وحنون اسمك 'راحة'. رد بالعامية المصرية الدافئة والمريحة جداً، وخليك مختصر ومفيد." },
+                            { role: "user", content: text }
+                        ]
                     })
                 });
                 
                 const data = await response.json();
                 
-                if (data.candidates && data.candidates.length > 0) {
-                    const answer = data.candidates[0].content.parts[0].text;
+                if (data.choices && data.choices.length > 0) {
+                    const answer = data.choices[0].message.content;
                     chat.innerHTML += `<div class="msg ai">${answer}</div>`;
                 } else {
-                    chat.innerHTML += `<div class="msg ai">جوجل معترضة على حاجة: ${data.error ? data.error.message : 'عطل فني'}</div>`;
+                    chat.innerHTML += `<div class="msg ai">حصلت مشكلة في الرد: ${data.error ? data.error.message : 'عطل فني'}</div>`;
                 }
             } catch (e) {
-                chat.innerHTML += `<div class="msg ai">حصلت مشكلة في النت عندك أو في سيرفر جوجل.</div>`;
+                chat.innerHTML += `<div class="msg ai">سيرفر DeepSeek فيه مشكلة أو النت فصل.</div>`;
             }
             
             btn.disabled = false;
