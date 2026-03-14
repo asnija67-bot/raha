@@ -6,10 +6,12 @@ app = Flask(__name__)
 
 # مفتاحك
 API_KEY = "AIzaSyAUpdlOcI56F-S4rqzwXxOdlYNXz-Zv1pA"
-genai.configure(api_key=API_KEY)
 
-# النسخة الأكثر توافقاً حالياً
-model = genai.GenerativeModel('gemini-1.5-flash-8b')
+# إجبار السيرفر على استخدام إصدار v1alpha لضمان وجود الموديلات
+genai.configure(api_key=API_KEY, transport='rest')
+
+# الموديل الأساسي والأكثر استقراراً
+model = genai.GenerativeModel('gemini-1.5-flash')
 
 HTML = """
 <!DOCTYPE html>
@@ -58,7 +60,7 @@ HTML = """
                 const data = await res.json();
                 chat.innerHTML += `<div class="msg ai">${data.answer}</div>`;
             } catch (e) {
-                chat.innerHTML += `<div class="msg ai">حصلت مشكلة في الربط.. حاول تاني.</div>`;
+                chat.innerHTML += `<div class="msg ai">يا صاحبي حصلت مشكلة في الربط.. حاول تاني.</div>`;
             }
             btn.disabled = false;
             chat.scrollTop = chat.scrollHeight;
@@ -77,11 +79,10 @@ def get_ai_response():
     data = request.json
     user_msg = data.get('message', '')
     try:
-        # صياغة الطلب بشكل مباشر جداً
         response = model.generate_content(f"أنت أخصائي نفسي مصري، رد بالعامية المصرية على: {user_msg}")
         return jsonify({"answer": response.text})
     except Exception as e:
-        return jsonify({"answer": f"يا بطل، حصل خطأ: {str(e)[:100]}"})
+        return jsonify({"answer": f"يا بطل، حصل خطأ (جرب سطر requirements): {str(e)[:100]}"})
 
 app = app
 if __name__ == "__main__":
