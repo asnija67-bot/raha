@@ -4,9 +4,11 @@ from flask import Flask, request, jsonify, render_template_string
 
 app = Flask(__name__)
 
-# مفتاحك الجديد متسجل هنا وجاهز
+# مفتاحك الجديد شغال 100%
 API_KEY = "AIzaSyC-FtNsao7WdY17dJWQbKivF_J6oDGQddg"
-URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={API_KEY}"
+
+# التعديل النهائي هنا: استخدام الموديل المستقر 1.0-pro اللي بيشتغل في كل مكان
+URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.0-pro:generateContent?key={API_KEY}"
 
 HTML = """
 <!DOCTYPE html>
@@ -78,7 +80,7 @@ def get_ai_response():
     
     payload = {
         "contents": [{
-            "parts": [{"text": f"أنت أخصائي نفسي مصري حكيم وحنون اسمك 'راحة'. رد بالعامية المصرية الدافئة على: {user_msg}"}]
+            "parts": [{"text": f"أنت أخصائي نفسي مصري حكيم وحنون اسمك 'راحة'. رد بالعامية المصرية الدافئة والمريحة جداً على: {user_msg}"}]
         }]
     }
     headers = {'Content-Type': 'application/json'}
