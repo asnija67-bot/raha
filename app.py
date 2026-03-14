@@ -7,8 +7,8 @@ app = Flask(__name__)
 # مفتاحك السليم
 API_KEY = "AIzaSyC-FtNsao7WdY17dJWQbKivF_J6oDGQddg"
 
-# رجعنا الموديل الحديث (1.5-flash) اللي جوجل بتدعمه دلوقتي
-URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={API_KEY}"
+# الرابط الرسمي المعتمد (v1) اللي مفيش فيه أي مشاكل
+URL = f"https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key={API_KEY}"
 
 HTML = """
 <!DOCTYPE html>
