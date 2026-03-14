@@ -7,7 +7,9 @@ app = Flask(__name__)
 # إعداد المفتاح مباشرة
 API_KEY = "AIzaSyAUpdlOcI56F-S4rqzwXxOdlYNXz-Zv1pA"
 genai.configure(api_key=API_KEY)
-model = genai.GenerativeModel('gemini-1.5-flash')
+
+# التعديل الذهبي: استخدام gemini-pro لضمان التشغيل
+model = genai.GenerativeModel('gemini-pro')
 
 HTML = """
 <!DOCTYPE html>
@@ -20,12 +22,12 @@ HTML = """
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #fdfbff; margin: 0; display: flex; flex-direction: column; height: 100vh; }
         .header { background: #6750a4; color: white; padding: 15px; text-align: center; font-weight: bold; font-size: 20px; }
         .chat-container { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
-        .msg { max-width: 85%; padding: 12px 18px; border-radius: 18px; font-size: 16px; line-height: 1.6; }
+        .msg { max-width: 85%; padding: 12px 18px; border-radius: 18px; font-size: 16px; line-height: 1.6; position: relative; }
         .user { align-self: flex-start; background: #eaddff; color: #21005d; border-bottom-left-radius: 4px; }
         .ai { align-self: flex-end; background: #ffffff; color: #1c1b1f; border: 1px solid #cac4d0; border-bottom-right-radius: 4px; }
         .input-area { background: white; padding: 15px; display: flex; gap: 10px; border-top: 1px solid #ddd; padding-bottom: 30px; }
-        input { flex: 1; padding: 12px; border: 1px solid #79747e; border-radius: 25px; outline: none; }
-        button { background: #6750a4; color: white; border: none; padding: 10px 22px; border-radius: 25px; cursor: pointer; }
+        input { flex: 1; padding: 12px; border: 1px solid #79747e; border-radius: 25px; outline: none; font-size: 16px; }
+        button { background: #6750a4; color: white; border: none; padding: 10px 22px; border-radius: 25px; cursor: pointer; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -35,17 +37,21 @@ HTML = """
     </div>
     <div class="input-area">
         <input type="text" id="user-input" placeholder="فضفض هنا..." onkeypress="if(event.key==='Enter') send()">
-        <button onclick="send()">إرسال</button>
+        <button id="send-btn" onclick="send()">إرسال</button>
     </div>
     <script>
         async function send() {
             const input = document.getElementById('user-input');
             const chat = document.getElementById('chat');
+            const btn = document.getElementById('send-btn');
             const text = input.value.trim();
             if(!text) return;
+
             chat.innerHTML += `<div class="msg user">${text}</div>`;
             input.value = '';
+            btn.disabled = true;
             chat.scrollTop = chat.scrollHeight;
+
             try {
                 const res = await fetch('/get_ai_response', {
                     method: 'POST',
@@ -55,8 +61,9 @@ HTML = """
                 const data = await res.json();
                 chat.innerHTML += `<div class="msg ai">${data.answer}</div>`;
             } catch (e) {
-                chat.innerHTML += `<div class="msg ai">حصل مشكلة في الربط.. حاول تاني كمان شوية.</div>`;
+                chat.innerHTML += `<div class="msg ai">يا صاحبي حصلت مشكلة تقنية.. حاول تاني كمان ثواني.</div>`;
             }
+            btn.disabled = false;
             chat.scrollTop = chat.scrollHeight;
         }
     </script>
@@ -72,16 +79,15 @@ def home():
 def get_ai_response():
     data = request.json
     user_msg = data.get('message', '')
-    prompt = f"أنت أخصائي نفسي مصري حكيم وهادئ وحنون جداً، اسمك 'راحة'. رد بالعامية المصرية الدافئة: {user_msg}"
+    prompt = f"أنت أخصائي نفسي مصري حكيم وهادئ وحنون، اسمك 'راحة'. أجب بالعامية المصرية الدافئة والمريحة على: {user_msg}"
     try:
         response = model.generate_content(prompt)
-        # هنا التأكد إن الرد راجع كـ نص
+        # التأكد من استخراج النص بشكل صحيح
         return jsonify({"answer": response.text})
     except Exception as e:
-        # هنا هيطبع لنا الغلط فين لو حصل
-        print(f"Error: {e}")
-        return jsonify({"answer": f"يا صاحبي حصلت مشكلة تقنية: {str(e)[:50]}"})
+        return jsonify({"answer": f"يا صاحبي حصلت مشكلة تقنية: {str(e)[:100]}"})
 
 app = app
 if __name__ == "__main__":
     app.run()
+    
